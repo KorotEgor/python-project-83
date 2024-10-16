@@ -1,24 +1,18 @@
-[project]
-name = "page_analyzer"
+[tool.poetry]
+name = "hexlet-code"
 version = "0.1.0"
-description = "Add your description here"
+description = ""
+authors = ["korotkov_egor <korotkovegor10@gmail.com>"]
 readme = "README.md"
-requires-python = ">=3.10"
-dependencies = [
-    "flask>=3.0.3",
-    "gunicorn>=23.0.0",
-    "python-dotenv>=1.0.1",
-]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Flask = "^3.0.3"
+ruff = "^0.6.9"
+gunicorn = "^23.0.0"
+python-dotenv = "^1.0.1"
+
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.uv]
-dev-dependencies = [
-    "ruff>=0.6.9",
-]
-
-[tool.ruff]
-line-length = 80
-fix = true
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
