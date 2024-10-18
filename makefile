@@ -4,7 +4,13 @@ install:
 	poetry install
 
 lint:
-	uv run ruff format && uv run ruff check
+	poetry run ruff format && uv run ruff check
+
+db:
+	sudo service postgresql start
+
+build:
+	./build.sh
 
 dev:
 	poetry run flask --app page_analyzer:app run
