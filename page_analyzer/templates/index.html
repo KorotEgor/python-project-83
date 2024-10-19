@@ -17,10 +17,11 @@
         </div>
       </nav>
     </header>
+
     {% if messages %}
-      {% for category, message in messages %}
-        <div class="{{ category }}">{{ message }}</div>
-      {% endfor %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
     {% endif %}
 
     <main class="flex-grow-1">

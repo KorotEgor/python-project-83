@@ -23,13 +23,19 @@ class SiteRepository:
     def get_content(self):
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute("SELECT * FROM users")
+                cur.execute("SELECT * FROM urls")
                 return cur.fetchall()
+    
+    def find_id(self, url):
+        with self.get_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("SELECT * FROM urls WHERE name = %s", (url,))
+                id = cur.fetchone()['id']
+        
+        return id
 
     def find(self, id):
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute("SELECT * FROM users WHERE id = %s", (id,))
+                cur.execute("SELECT * FROM urls WHERE id = %s", (id,))
                 return cur.fetchone()
-
-

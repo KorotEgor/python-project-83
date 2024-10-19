@@ -1,6 +1,6 @@
-from email import message
 from flask import flash, Flask, redirect, render_template, request, url_for, get_flashed_messages
 from page_analyzer import db, validator
+import psycopg2
 import os
 from dotenv import load_dotenv
 
@@ -29,17 +29,25 @@ def post_sites():
     
     if error:
         flash(error, "alert alert-danger")
-        return redirect(url_for('index'))
-
-    id = repo.save(url)
-    flash("Страница успешно добавлена", "success")
-    return redirect(url_for("show_site"), code=302)
+        return redirect(url_for("index", code=302))
+    try:
+        id = repo.save(url)
+    except psycopg2.errors.UniqueViolation:
+        id = repo.find_id(url)
+        flash('Страница уже существует', "alert alert-info")
+        return redirect(url_for("show_site", id=id))
+    
+    flash("Страница успешно добавлена", "alert alert-success")
+    return redirect(url_for("show_site", id=id))
 
 
 @app.get("/urls/<id>")
 def show_site(id):
     messages = get_flashed_messages(with_categories=True)
+    site = repo.find(id)
+    site['created_at'] = site['created_at'].date()
     return render_template(
-        "index.html",
+        "site.html",
         messages=messages,
+        site=site,
     )
