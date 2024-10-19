@@ -51,3 +51,12 @@ def show_site(id):
         messages=messages,
         site=site,
     )
+
+
+@app.get("/urls")
+def show_sites():
+    sites = repo.get_sites()
+    return render_template(
+        "sites.html",
+        sites=sites,
+    )

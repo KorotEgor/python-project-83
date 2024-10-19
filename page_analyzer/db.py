@@ -20,7 +20,7 @@ class SiteRepository:
 
         return id
 
-    def get_content(self):
+    def get_sites(self):
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
                 cur.execute("SELECT * FROM urls")
