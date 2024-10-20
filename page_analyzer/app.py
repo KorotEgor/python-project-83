@@ -31,7 +31,7 @@ def post_sites():
         flash(error, "alert alert-danger")
         return redirect(url_for("index", code=302))
     try:
-        id = repo.save(url)
+        id = repo.save_to_urls(url)
     except psycopg2.errors.UniqueViolation:
         id = repo.find_id(url)
         flash('Страница уже существует', "alert alert-info")
@@ -41,22 +41,31 @@ def post_sites():
     return redirect(url_for("show_site", id=id))
 
 
-@app.get("/urls/<id>")
+@app.get("/urls/<int:id>")
 def show_site(id):
     messages = get_flashed_messages(with_categories=True)
     site = repo.find(id)
-    site['created_at'] = site['created_at'].date()
+    checks = repo.get_checks_by_id(id)
     return render_template(
         "site.html",
         messages=messages,
         site=site,
+        checks=checks,
     )
 
 
 @app.get("/urls")
 def show_sites():
-    sites = repo.get_sites()
+    sites = repo.get_sites_and_checks()
     return render_template(
         "sites.html",
         sites=sites,
     )
+
+
+@app.post("/urls/<int:id>/checks")
+def post_checks(id):
+    repo.save_to_checks(id, 200, 'header', 'title', 'desc')
+
+    flash("Страница успешно проверена", "alert alert-success")
+    return redirect(url_for("show_site", id=id))
