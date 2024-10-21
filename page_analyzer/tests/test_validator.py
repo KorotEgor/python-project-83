@@ -1,4 +1,4 @@
-from page_analyzer import validator
+from page_analyzer import utils
 import pytest
 
 CASES = (
@@ -11,4 +11,4 @@ CASES = (
 
 @pytest.mark.parametrize("url, res, err", CASES)
 def test_validate(url, res, err):
-    assert validator.validate(url) == (res, err)
+    assert utils.validate(url) == (res, err)

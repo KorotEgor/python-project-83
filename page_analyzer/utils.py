@@ -15,3 +15,17 @@ def validate(url):
         params="",
         query="",
     ).geturl(), None
+
+
+def get_tag(soup, tag):
+    val = soup.find(tag)
+    if val is None:
+        return ""
+    return val.string
+
+
+def get_desc(soup):
+    val = soup.find("meta", attrs={"name": "description"})
+    if val is None:
+        return ""
+    return val.get("content", "")

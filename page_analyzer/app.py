@@ -1,14 +1,23 @@
-from flask import flash, Flask, redirect, render_template, request, url_for, get_flashed_messages
-from page_analyzer import db, validator
+from flask import (
+    flash,
+    Flask,
+    redirect,
+    render_template,
+    request,
+    url_for,
+    get_flashed_messages,
+)
+from page_analyzer import db, utils
 import psycopg2
 import os
 from dotenv import load_dotenv
 import requests
+from bs4 import BeautifulSoup
 
 load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["DATABASE_URL"] = os.getenv("DATABASE_URL")
 
 repo = db.SiteRepository(app.config["DATABASE_URL"])
@@ -26,8 +35,8 @@ def index():
 @app.post("/urls")
 def post_sites():
     url = request.form.to_dict()["url"]
-    url, error = validator.validate(url)
-    
+    url, error = utils.validate(url)
+
     if error:
         flash(error, "alert alert-danger")
         return redirect(url_for("index", code=302))
@@ -35,9 +44,9 @@ def post_sites():
         id = repo.save_to_urls(url)
     except psycopg2.errors.UniqueViolation:
         id = repo.find_id(url)
-        flash('Страница уже существует', "alert alert-info")
+        flash("Страница уже существует", "alert alert-info")
         return redirect(url_for("show_site", id=id))
-    
+
     flash("Страница успешно добавлена", "alert alert-success")
     return redirect(url_for("show_site", id=id))
 
@@ -68,16 +77,27 @@ def show_sites():
 def post_checks(id):
     site = repo.find_site(id)
     try:
-        request = requests.get(site['name'])
+        request = requests.get(
+            site["name"],
+            headers={"User-Agent": "page_analyzer"},
+        )
     except requests.exceptions.RequestException:
         flash("Произошла ошибка при проверке", "alert alert-danger")
         return redirect(url_for("show_site", id=id))
-    
+
     if not request.ok:
         flash("Произошла ошибка при проверке", "alert alert-danger")
         return redirect(url_for("show_site", id=id))
 
-    repo.save_to_checks(id, request.status_code, 'header', 'title', 'desc')
-    
+    soup = BeautifulSoup(request.text, "html.parser")
+
+    repo.save_to_checks(
+        id,
+        request.status_code,
+        utils.get_tag(soup, "h1"),
+        utils.get_tag(soup, "title"),
+        utils.get_desc(soup),
+    )
+
     flash("Страница успешно проверена", "alert alert-success")
     return redirect(url_for("show_site", id=id))

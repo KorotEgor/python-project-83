@@ -19,7 +19,7 @@ class SiteRepository:
                 id = cur.fetchone()[0]
 
         return id
-    
+
     def save_to_checks(self, url_id, status_code, h1, title, description):
         with self.get_connection() as conn:
             with conn.cursor() as cur:
@@ -46,7 +46,7 @@ class SiteRepository:
                     (url_id,),
                 )
                 return cur.fetchall()
-    
+
     def get_sites_and_checks(self):
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
