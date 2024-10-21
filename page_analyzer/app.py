@@ -3,6 +3,7 @@ from page_analyzer import db, validator
 import psycopg2
 import os
 from dotenv import load_dotenv
+import requests
 
 load_dotenv()
 
@@ -44,7 +45,7 @@ def post_sites():
 @app.get("/urls/<int:id>")
 def show_site(id):
     messages = get_flashed_messages(with_categories=True)
-    site = repo.find(id)
+    site = repo.find_site(id)
     checks = repo.get_checks_by_id(id)
     return render_template(
         "site.html",
@@ -65,7 +66,18 @@ def show_sites():
 
 @app.post("/urls/<int:id>/checks")
 def post_checks(id):
-    repo.save_to_checks(id, 200, 'header', 'title', 'desc')
+    site = repo.find_site(id)
+    try:
+        request = requests.get(site['name'])
+    except requests.exceptions.RequestException:
+        flash("Произошла ошибка при проверке", "alert alert-danger")
+        return redirect(url_for("show_site", id=id))
+    
+    if not request.ok:
+        flash("Произошла ошибка при проверке", "alert alert-danger")
+        return redirect(url_for("show_site", id=id))
 
+    repo.save_to_checks(id, request.status_code, 'header', 'title', 'desc')
+    
     flash("Страница успешно проверена", "alert alert-success")
     return redirect(url_for("show_site", id=id))

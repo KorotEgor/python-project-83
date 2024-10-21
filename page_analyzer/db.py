@@ -79,7 +79,7 @@ class SiteRepository:
 
         return id
 
-    def find(self, id):
+    def find_site(self, id):
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
                 cur.execute("SELECT * FROM urls WHERE id = %s;", (id,))
