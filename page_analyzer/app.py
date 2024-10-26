@@ -1,3 +1,4 @@
+from email import message
 from flask import (
     flash,
     Flask,
@@ -38,8 +39,10 @@ def post_sites():
     url, error = utils.validate(url)
 
     if error:
-        flash(error, "alert alert-danger")
-        return redirect(url_for("index", code=402))
+        return render_template(
+            "index.html",
+            messages=[("alert alert-danger", error)],
+        ), 422
     try:
         id = repo.save_to_urls(url)
     except psycopg2.errors.UniqueViolation:
