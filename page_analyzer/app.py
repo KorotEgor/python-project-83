@@ -1,4 +1,3 @@
-from email import message
 from flask import (
     flash,
     Flask,

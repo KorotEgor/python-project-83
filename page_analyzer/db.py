@@ -38,9 +38,9 @@ class SiteRepository:
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
                 cur.execute(
-                    """SELECT * 
-                    FROM url_checks 
-                    WHERE url_id = %s 
+                    """SELECT *
+                    FROM url_checks
+                    WHERE url_id = %s
                     ORDER BY created_at DESC
                     ;""",
                     (url_id,),
@@ -57,13 +57,13 @@ class SiteRepository:
                         GROUP BY url_id
                     )
                     SELECT
-                        urls.id AS id, 
-                        urls.name AS name, 
-                        url_checks.created_at AS created_at, 
-                        url_checks.status_code AS status_code 
+                        urls.id AS id,
+                        urls.name AS name,
+                        url_checks.created_at AS created_at,
+                        url_checks.status_code AS status_code
                     FROM urls
                     LEFT JOIN last_check
-                    ON last_check.url_id = urls.id 
+                    ON last_check.url_id = urls.id
                     LEFT JOIN url_checks
                     ON last_check.id = url_checks.id
                     ORDER BY urls.id DESC
