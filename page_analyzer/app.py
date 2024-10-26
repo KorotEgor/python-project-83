@@ -39,7 +39,7 @@ def post_sites():
 
     if error:
         flash(error, "alert alert-danger")
-        return redirect(url_for("index", code=302))
+        return redirect(url_for("index", code=402))
     try:
         id = repo.save_to_urls(url)
     except psycopg2.errors.UniqueViolation:
